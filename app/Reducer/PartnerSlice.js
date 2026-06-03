@@ -16,8 +16,10 @@ export const partnerWithUs = createAsyncThunk(
                 }
             }
         } catch (err) {
-            return rejectWithValue(err);
-        }
+             return rejectWithValue(
+                err?.response?.data?.message || err.message
+    );
+}
     }
 );
 
@@ -25,7 +27,8 @@ export const getCountry = createAsyncThunk(
     'getCountry',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.get('/country/countries', userInput);
+            const response = await api.get('/country/countries', {
+                params: userInput});
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -36,8 +39,11 @@ export const getCountry = createAsyncThunk(
                 }
             }
         } catch (err) {
-            return rejectWithValue(err);
-        }
+            return rejectWithValue(
+              err?.response?.data?.message || err.message
+    );
+}
+        
     }
 );
 const initialState={
