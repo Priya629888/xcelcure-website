@@ -1,6 +1,7 @@
 'use client';
 
 import axios from 'axios';
+console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
 const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_BASE_URL });
 
 const formDataURL = ['user/user-profile/change-avatar'];

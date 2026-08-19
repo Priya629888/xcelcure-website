@@ -5,6 +5,8 @@ import "../assets/css/custom.css";
 import Header from "./ui/header";
 import Footer from "./ui/footer";
 import Providers from "./Reducer/Providers";
+import ReCaptchaProvider from "./ReCaptchaProvider";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,19 +39,54 @@ export const metadata = {
   description: "Xcelcure",
 };
 
+// export default function RootLayout({ children }) {
+//   return (
+//     <html lang="en">
+//       <body
+//         className={`${helveticaNeue.variable} ${geistMono.variable} antialiased`}
+//       >
+//         <main>
+//           <Providers>
+//           <Header />
+//           {children}
+//           <Footer />
+//            </Providers>
+//         </main>
+//       </body>
+//     </html>
+//   );
+// }
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
         className={`${helveticaNeue.variable} ${geistMono.variable} antialiased`}
       >
-        <main>
-          <Providers>
-          <Header />
-          {children}
-          <Footer />
-           </Providers>
-        </main>
+        {/* Google Analytics */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+          `}
+        </Script>
+        
+        <ReCaptchaProvider>
+          <main>
+            <Providers>
+              <Header />
+              {children}
+              <Footer />
+            </Providers>
+          </main>
+        </ReCaptchaProvider>
       </body>
     </html>
   );

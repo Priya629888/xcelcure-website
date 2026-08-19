@@ -1,9 +1,9 @@
 'use client';
 import { configureStore } from '@reduxjs/toolkit';
-import EstimateSlice from '../Reducer/EstimateSlice'
-import ContactUsSlice from '../Reducer/ContactUsSlice'
-import PartnerSlice from '../Reducer/PartnerSlice'
-import DemoSlice from '../Reducer/DemoSlice'
+import EstimateSlice from './EstimateSlice'
+import ContactUsSlice from './ContactUsSlice'
+import PartnerSlice from './PartnerSlice'
+import DemoSlice from './DemoSlice'
 const store=configureStore(
     {
         reducer:{
