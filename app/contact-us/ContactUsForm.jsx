@@ -4,31 +4,147 @@ import { Button, Label, Textarea, TextInput } from "flowbite-react";
 import Image from "next/image";
 import captcha_img from "../../assets/imagesource/captcha_img.png";
 import { useForm } from "react-hook-form";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { BiLogoGmail, BiSolidPhone } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { contactUs } from "../Reducer/ContactUsSlice";
 import { toast } from "react-toastify";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 const ContactUsForm=()=>{
     const{loading}=useSelector((state)=>state?.contact)
-        const {
-        register,
-        handleSubmit,
-        formState: { errors },
-  } = useForm();
-  const dispatch=useDispatch()
-  const onSubmit=(data)=>{
-    dispatch(contactUs(data)).then((res)=>{
-        if(res?.payload?.status_code===200){
-            toast.success(res?.payload?.message)
-        }
-    })
+            // const {
+            //   register,
+            //   handleSubmit,
+            //   reset,
+            //   formState: { errors },
+            // } = useForm({
+            //   mode: "onChange",
+            // });
+            const {
+              register,
+              handleSubmit,
+              reset,
+              formState: { errors },
+            } = useForm({
+              mode: "onChange",
+              defaultValues: {
+                name: "",
+                email: "",
+                organization_name: "",
+                message: "",
+              },
+            });
+            
+//const dispatch=useDispatch()
+//   const onSubmit=(data)=>{
+//     dispatch(contactUs(data)).then((res)=>{
+//         if(res?.payload?.status_code===200){
+//             toast.success(res?.payload?.message)
+//         }
+//     })
+//   }
+
+const { executeRecaptcha } = useGoogleReCaptcha();
+
+const [phone, setPhone] = useState("");
+
+// const onSubmit = async(data) => {
+
+//   if (!captchaToken) {
+//     toast.error("Please complete the reCAPTCHA");
+//     return;
+//   }
+//   const response = await fetch("/api/contact", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       ...data,
+//       recaptcha_token: captchaToken,
+//     }),
+//   });
+
+//   const result = await response.json();
+
+//   if (result.success) {
+//     toast.success("Email sent successfully");
+//   } else {
+//     toast.error("Failed to send email");
+//   }
+// };
+const  onSubmit = async (data) => {
+
+// Phone validation
+  if (!phone || !isValidPhoneNumber(phone)) {
+    toast.error("Please enter a valid phone number");
+    return;
   }
+
+  if (!executeRecaptcha) {
+    toast.error("reCAPTCHA not ready");
+    return;
+  }
+
+  const token = await executeRecaptcha("contact_form");
+
+  const response = await fetch("/api/contact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...data,
+      phone,
+      recaptcha_token: token,
+    }),
+  });
+
+  const result = await response.json();
+
+  // if (result.success) {
+  //   toast.success("Email sent successfully");
+
+  //   reset();
+  //   setPhone("");
+  // } 
+  if (result.success) {
+  reset({
+    name: "",
+    email: "",
+    organization_name: "",
+    message: "",
+  });
+
+  setPhone("");
+
+  toast.success("Email sent successfully");
+}else {
+    toast.error(result.message || "Failed to send email");
+  }
+};
+
+//   dispatch(
+//     contactUs({
+//       ...data,
+//       recaptcha_token: captchaToken,
+//     })
+//   ).then((res) => {
+//     if (res?.payload?.status_code === 200) {
+//       toast.success(res?.payload?.message);
+//     }
+//   });
+// };
+
   
     return(
         <>
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
          <div className="lg:flex gap-12">
     <div className="lg:w-7/12 mb-8 lg:mb-0">
         <div className="mb-6">
@@ -44,14 +160,34 @@ const ContactUsForm=()=>{
                 <div className="mb-0 block">
                 <Label htmlFor="base">Name <span>*</span></Label>
                 </div>
-                <TextInput {...register("name",{ required: "Name is required" })} id="base" type="text" sizing="md" placeholder="Enter Name" />
+                <TextInput {...register("name", {
+  required: "Name is required",
+  minLength: {
+    value: 3,
+    message: "Name must be at least 3 characters"
+  },
+  maxLength: {
+    value: 50,
+    message: "Name cannot exceed 50 characters"
+  },
+  pattern: {
+    value: /^[A-Za-z ]+$/,
+    message: "Only letters allowed"
+  }
+})} id="base" type="text" sizing="md" placeholder="Enter Name" />
              {errors.name && <span className="text-red-500 text-xs">{errors.name.message}</span>}
             </div>
             <div className="w-6/12">
                 <div className="mb-0 block">
                 <Label htmlFor="base">Email Address <span>*</span></Label>
                 </div>
-                <TextInput {...register("email",{required: "Email is required",})} id="base" type="email" sizing="md" placeholder="Enter Email" />
+                <TextInput {...register("email", {
+  required: "Email is required",
+  pattern: {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: "Enter a valid email address"
+  }
+})} id="base" type="email" sizing="md" placeholder="Enter Email" />
             {errors.email && <span className="text-red-500 text-xs">{errors.email.message}</span>}
             </div>
         </div>
@@ -60,14 +196,31 @@ const ContactUsForm=()=>{
                 <div className="mb-0 block">
                 <Label htmlFor="base">Phone <span>*</span></Label>
                 </div>
-                <TextInput {...register("phone",{ required: "Phone is required", minLength: { value: 10, message: "Invalid phone number" }})} id="base" type="text" sizing="md" />
+                {/* <TextInput {...register("phone",{ required: "Phone is required", minLength: { value: 10, message: "Invalid phone number" }})} id="base" type="text" sizing="md" /> */}
+                <PhoneInput
+                  international
+                  defaultCountry="IN"
+                  value={phone}
+                  onChange={setPhone}
+                  className="border rounded-lg p-3"
+                />
                 {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message}</span>}
             </div>
             <div className="w-6/12">
                 <div className="mb-0 block">
                 <Label htmlFor="base">Organization Name <span>*</span></Label>
                 </div>
-                <TextInput {...register("organization_name",{required: "Organization name is required"})} id="base" type="text" sizing="md" />
+                <TextInput {...register("organization_name", {
+  required: "Organization name is required",
+  minLength: {
+    value: 2,
+    message: "Minimum 2 characters"
+  },
+  maxLength: {
+    value: 100,
+    message: "Maximum 100 characters"
+  }
+})} id="base" type="text" sizing="md" />
                  {errors.organization_name && (
                 <span className="text-red-500 text-xs">{errors.organization_name.message}</span>
               )}
@@ -78,17 +231,26 @@ const ContactUsForm=()=>{
                 <div className="mb-0 block">
                 <Label htmlFor="base">Message <span>*</span></Label>
                 </div>
-                <Textarea {...register("message",{
-                required: "Message is required",
-              })} id="comment" placeholder="Enter Message"  rows={5} />
+                <Textarea {...register("message", {
+  required: "Message is required",
+  minLength: {
+    value: 20,
+    message: "Message must be at least 20 characters"
+  },
+  maxLength: {
+    value: 1000,
+    message: "Message cannot exceed 1000 characters"
+  }
+})} id="comment" placeholder="Enter Message"  rows={5} />
             {errors.message && <span className="text-red-500 text-xs">{errors.message.message}</span>}
             </div>
         </div>
-        <div className="mb-4">
-            <div className="mt-2">
-            <Image src={captcha_img} alt='captcha_img' className="w-5/12" />
-            </div>
-        </div>
+       {/* <ReCAPTCHA
+        sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+        onChange={(token) => setCaptchaToken(token)}
+        /> */}
+        
+        
         <div className="form_area submit_btn">
         <Button 
         disabled={loading}

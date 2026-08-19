@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
+import axios from "axios";
 
 export const contactUs = createAsyncThunk(
     'contactUs',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/contact-us/request-contact-us', userInput);
+            // const response = await api.post('/contact-us/request-contact-us', userInput);
+            const response = await axios.post('/api/contact', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
