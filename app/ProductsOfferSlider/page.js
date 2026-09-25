@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Slider from "react-slick";
 
@@ -21,6 +21,17 @@ import "slick-carousel/slick/slick-theme.css";
 import Link from 'next/link';
 
 const ProductsOfferSlider = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!mounted) return null;
+
   var settings = {
     dots: false,
     infinite: true,
@@ -33,18 +44,19 @@ const ProductsOfferSlider = () => {
         {
             breakpoint: 1024,
             settings: {
-                slidesToShow: 3,
+                slidesToShow: 2,
                 slidesToScroll: 1,
                 infinite: true,
                 dots: true
             }
         },
         {
-            breakpoint: 600,
+            breakpoint: 768,
             settings: {
-                slidesToShow: 2,
-                slidesToScroll: 2,
+                slidesToShow: 1,
+                slidesToScroll: 1,
                 arrows:false,
+                dots: true
             }
         },
         {
@@ -53,6 +65,7 @@ const ProductsOfferSlider = () => {
                 slidesToShow: 1,
                 slidesToScroll: 1,
                 arrows:false,
+                dots: true
             }
         }
         // You can unslick at a given breakpoint now by adding:
@@ -67,8 +80,8 @@ const ProductsOfferSlider = () => {
             <div className='px-2 p-4'>
                 <div className="bg-white shadow-lg rounded-[30px] p-3 text-left">
                   <div className="relative">
-                    <Image src={product_slider_01} alt='product_slider_01' className='mb-8' />
-                    <div className="absolute right-[30px] lg:right-[37px] bottom-[-22px] lg:bottom-[-15px]">
+                    <Image src={product_slider_01} alt='product_slider_01' className='w-full mb-8' />
+                    <div className="absolute right-[12px] lg:right-[37px] bottom-[-15px] lg:bottom-[-15px]">
                       <Link className=" text-black bg-[#ffffff] font-medium text-xs lg:text-sm rounded-[35px] hover:bg-white hover:text-[#1955ef]" href="/" passHref>
                         <div className="bg-[#1955EF] hover:bg-black w-[38px] h-[38px] rounded-[100px] flex justify-center items-center">
                           <GoArrowUpRight className="text-white text-xl" />
@@ -95,8 +108,8 @@ const ProductsOfferSlider = () => {
             <div className='px-2 py-4'>
                 <div className="bg-white shadow-lg rounded-[30px] p-3 text-left">
                   <div className="relative">
-                    <Image src={product_slider_02} alt='product_slider_02' className='mb-8' />
-                    <div className="absolute right-[30px] lg:right-[37px] bottom-[-22px] lg:bottom-[-15px]">
+                    <Image src={product_slider_02} alt='product_slider_02' className='w-full mb-8' />
+                    <div className="absolute right-[12px] lg:right-[37px] bottom-[-15px] lg:bottom-[-15px]">
                       <Link className=" text-black bg-[#ffffff] font-medium text-xs lg:text-sm rounded-[35px] hover:bg-white hover:text-[#1955ef]" href="/" passHref>
                         <div className="bg-[#1955EF] hover:bg-black w-[38px] h-[38px] rounded-[100px] flex justify-center items-center">
                           <GoArrowUpRight className="text-white text-xl" />
@@ -120,8 +133,8 @@ const ProductsOfferSlider = () => {
             <div className='px-2 py-4'>
                 <div className="bg-white shadow-lg rounded-[30px] p-3 text-left">
                   <div className="relative">
-                    <Image src={product_slider_03} alt='product_slider_03' className='mb-8' />
-                    <div className="absolute right-[30px] lg:right-[37px] bottom-[-22px] lg:bottom-[-15px]">
+                    <Image src={product_slider_03} alt='product_slider_03' className='w-full mb-8' />
+                    <div className="absolute right-[12px] lg:right-[37px] bottom-[-15px] lg:bottom-[-15px]">
                       <Link className=" text-black bg-[#ffffff] font-medium text-xs lg:text-sm rounded-[35px] hover:bg-white hover:text-[#1955ef]" href="/" passHref>
                         <div className="bg-[#1955EF] hover:bg-black w-[38px] h-[38px] rounded-[100px] flex justify-center items-center">
                           <GoArrowUpRight className="text-white text-xl" />
@@ -144,8 +157,8 @@ const ProductsOfferSlider = () => {
             <div className='px-2 p-4'>
                 <div className="bg-white shadow-lg rounded-[30px] p-3 text-left">
                   <div className="relative">
-                    <Image src={product_slider_01} alt='product_slider_01' className='mb-8' />
-                    <div className="absolute right-[30px] lg:right-[37px] bottom-[-22px] lg:bottom-[-15px]">
+                    <Image src={product_slider_01} alt='product_slider_01' className='w-full mb-8' />
+                    <div className="absolute right-[12px] lg:right-[37px] bottom-[-15px] lg:bottom-[-15px]">
                       <Link className=" text-black bg-[#ffffff] font-medium text-xs lg:text-sm rounded-[35px] hover:bg-white hover:text-[#1955ef]" href="/" passHref>
                         <div className="bg-[#1955EF] hover:bg-black w-[38px] h-[38px] rounded-[100px] flex justify-center items-center">
                           <GoArrowUpRight className="text-white text-xl" />

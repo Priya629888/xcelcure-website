@@ -14,34 +14,35 @@ export const demoRequest = createAsyncThunk(
                     return rejectWithValue('Something went wrong.');
                 }
             }
-        } catch (err) {
-            return rejectWithValue(err);
+        } catch (error) {
+            // return rejectWithValue(error);
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 );
-const initialState={
-    loading:false,
-    error:false,
-    demoRequestData:""
+const initialState = {
+    loading: false,
+    error: false,
+    demoRequestData: ""
 
 }
-const DemoSlice=createSlice({
-name:"demo",
-initialState,
-reducers:{},
-extraReducers:(builder)=>{
-    builder.addCase(demoRequest.pending,(state)=>{
-        state.loading=true
-    })
-    .addCase(demoRequest.fulfilled,(state,{payload})=>{
-        state.loading=false
-        state.demoRequestData=payload
-        state.error=false
-    })
-    .addCase(demoRequest.rejected,(state,{payload})=>{
-        state.loading=false
-        state.error=payload
-    })
-}
+const DemoSlice = createSlice({
+    name: "demo",
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder.addCase(demoRequest.pending, (state) => {
+            state.loading = true
+        })
+            .addCase(demoRequest.fulfilled, (state, { payload }) => {
+                state.loading = false
+                state.demoRequestData = payload
+                state.error = false
+            })
+            .addCase(demoRequest.rejected, (state, { payload }) => {
+                state.loading = false
+                state.error = payload
+            })
+    }
 })
 export default DemoSlice.reducer;

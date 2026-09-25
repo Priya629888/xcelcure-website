@@ -64,7 +64,7 @@
 //                         </div>
 //                          <Select
 //                         {...register("country_id", { required: "Country is required" })}
-                        
+
 //                         >
 //                         <option value="">Select Country</option>
 //                         {countryList?.data?.map((country) => (
@@ -154,50 +154,86 @@ const DemoForm = () => {
   const { countryList } = useSelector((state) => state.partner);
   const { loading } = useSelector((state) => state.demo);
   const recaptchaRef = useRef(null);
-  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false); 
-  const handleCaptchaChange = (value) => {
-    if (value) {
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+
+  useEffect(() => setMounted(true), []);
+
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    getValues,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  // const handleCaptchaChange = (token) => {
+  //   if (token) {
+  //     setIsCaptchaVerified(true);
+  //     const data = getValues();
+  //     dispatch(demoRequest(data)).then((res) => {
+  //       console.log(res, "res");
+
+  //       if (res?.payload?.status_code === 200) {
+  //         toast.success(res?.payload?.message);
+  //         reset();
+  //         setIsCaptchaVerified(false);
+  //         if (recaptchaRef.current) {
+  //           recaptchaRef.current.reset();
+  //         }
+  //       }
+  //     });
+  //   }
+  // };
+
+  const handleCaptchaChange = (token) => {
+    if (token) {
       setIsCaptchaVerified(true);
     } else {
       setIsCaptchaVerified(false);
     }
   };
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    reset,
-  } = useForm();
+
 
   useEffect(() => {
     dispatch(getCountry());
   }, [dispatch]);
 
+  // const onSubmit = (data) => {
+
+  //   if (recaptchaRef.current) {
+  //     recaptchaRef.current.execute();
+  //   }
+  // };
+
   const onSubmit = (data) => {
-        if (!isCaptchaVerified) {
-      toast.error("Please complete the Captcha");
+    if (!isCaptchaVerified) {
+      toast.error("Please click the 'I'm not a robot' checkbox");
       return;
     }
-    dispatch(demoRequest(data)).then((res)=>{
-      console.log(res,"res");
-      
-        if(res?.payload?.status_code===200){
-             toast.success(res?.payload?.message)
-          reset()
-           setIsCaptchaVerified(false);
+
+    dispatch(demoRequest(data)).then((res) => {
+      console.log(res, "res");
+      if (res?.payload?.status_code === 200) {
+        toast.success(res?.payload?.message);
+        reset();
+        setIsCaptchaVerified(false);
         if (recaptchaRef.current) {
           recaptchaRef.current.reset();
         }
-         
-        }
-    })
-    
+      }
+    });
   };
+
+
+  if (!mounted) return null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-       <ToastContainer/>
+      <ToastContainer />
       <div className="lg:flex gap-12">
         <div className="lg:w-7/12">
 
@@ -313,7 +349,7 @@ const DemoForm = () => {
                   })
                 }
               /> */}
-        <Controller
+              {/* <Controller
           name="demo_date"
           control={control}
           rules={{ required: "Date is required" }}
@@ -325,29 +361,59 @@ const DemoForm = () => {
               }}
             />
           )}
-        />
+        /> */}
+              {mounted && (
+                <Controller
+                  name="demo_date"
+                  control={control}
+                  rules={{ required: "Date is required" }}
+                  render={({ field }) => (
+                    <Datepicker
+                      onChange={(date) => {
+                        const formattedDate = date.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                        field.onChange(formattedDate);
+                      }}
+                    />
+                  )}
+                />
+              )}
 
-        {errors.demo_date && (
-          <p className="text-red-500 text-xs">{errors.demo_date.message}</p>
-        )}
+              {errors.demo_date && (
+                <p className="text-red-500 text-xs">{errors.demo_date.message}</p>
+              )}
 
 
               <div className="mt-2">
                 {/* <Image src={captcha_img} alt="captcha" className="w-9/12" /> */}
-                     <ReCAPTCHA
-                              ref={recaptchaRef}
-                              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                              onChange={handleCaptchaChange}
-                            />
+                {/* <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                  size=" invisible"
+                  onChange={handleCaptchaChange}
+                /> */}
+
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  // size="invisible"
+                  onChange={handleCaptchaChange}
+                />
+
+
               </div>
             </div>
           </div>
 
           {/* Submit */}
           <div className="form_area submit_btn">
-          <Button type="submit" disabled={loading ||!isCaptchaVerified}  className={(loading || !isCaptchaVerified) ? "opacity-60 cursor-not-allowed" : ""}>
-            {loading ? "Waiting..." : "Request a Demo"}
-          </Button>
+            {/* <Button type="submit" disabled={loading || !isCaptchaVerified} className={(loading || !isCaptchaVerified) ? "opacity-60 cursor-not-allowed" : ""}>
+              {loading ? "Waiting..." : "Request a Demo"}
+            </Button> */}
+
+            <Button type="submit" disabled={loading} className={loading ? "opacity-60 cursor-not-allowed" : ""}>
+              {loading ? "Waiting..." : "Request a Demo"}
+            </Button>
+
           </div>
         </div>
 

@@ -324,10 +324,11 @@ const PartnerForm = () => {
             <div className="w-6/12 mt-8">
               {/* <Image src={captcha_img} alt="captcha_img" className="w-9/12" /> */}
               <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-              onChange={handleCaptchaChange}
-            />
+                ref={recaptchaRef}
+                // sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                onChange={handleCaptchaChange}
+              />
             </div>
           </div>
 
@@ -335,8 +336,8 @@ const PartnerForm = () => {
           <div className="form_area submit_btn">
             <Button
               type="submit"
-              disabled={loading||!isCaptchaVerified}
-              className={(loading || !isCaptchaVerified)? "opacity-60 cursor-not-allowed" : ""}
+              disabled={loading || !isCaptchaVerified}
+              className={(loading || !isCaptchaVerified) ? "opacity-60 cursor-not-allowed" : ""}
             >
               {loading ? "Waiting" : "Request Partner"}
             </Button>
